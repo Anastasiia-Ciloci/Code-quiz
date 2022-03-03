@@ -1,1 +1,1 @@
-# Code-quiz
+# geographical-quiz
