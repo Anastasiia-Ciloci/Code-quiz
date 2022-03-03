@@ -49,55 +49,160 @@ var questionsEl = [
 // THEN I can save my initials and my score
 var startBtn = document.querySelector("#start-btn");
 var getQuestions = document.querySelector("#question-area");
-var endSCreen = document.querySelector("#endScreen");
+var endScreenEl = document.querySelector("#endScreen");
 var participantInitials = document.querySelector("#participant");
 var result = [];
+var currentQuestion = 0;
+//Timer
+var timerEl = document.querySelector("#timer");
+var secondsLeft = 10;
+var timer;
 // startBtn.style.backgroundColor;
 
 //functions for starting game and ending
 var startQuiz = function () {
   startBtn.style.display = "block";
   getQuestions.style.display = "none";
-  endSCreen.style.display = "none";
+  endScreenEl.style.display = "none";
 };
 
 var endQuiz = function () {
   startBtn.style.display = "none";
   getQuestions.style.display = "none";
-  endSCreen.style.display = "block";
+  endScreenEl.style.display = "block";
+  clearInterval(timer);
+  timerEl.innerHTML = "";
 };
 
 var quizScreen = function () {
   startBtn.style.display = "none";
   getQuestions.style.display = "block";
-  endSCreen.style.display = "none";
-  //looping through questions
-  for (var i = 0; i < questionsEl.length; i++) {
-    var answerOption = document.createElement("p");
-    answerOption.textContent = questionsEl[i].question;
-    answerOption.classList.add("p5");
-    getQuestions.appendChild(answerOption);
-
-    //looping through objects answers
-    var items = questionsEl[i].answers;
-    for (const item in items) {
-      var answerBtn = document.createElement("button");
-      answerBtn.textContent = items[item];
-      getQuestions.appendChild(answerBtn);
-
-      //getQuestions.appendChild(lineBreak);
-    }
-  }
+  endScreenEl.style.display = "none";
+  printQuestion(currentQuestion);
+  startTimer();
 };
 
-var endScreen = function () {
+var answerClick = function (event) {
+  if (event.target.matches("button")) {
+    //console.log(event.target);
+    //console.log(event.target.outerText);
+    var selectedAnswer = questionsEl[currentQuestion].answers.indexOf(
+      event.target.outerText
+    );
+    var correctAnswer = questionsEl[currentQuestion].correct;
+    console.log("selected answer is: " + selectedAnswer);
+    // grade
+    // print correct or not and substract time if incorrect
+
+    console.log("correct answer is: " + correctAnswer);
+    var commentEl = document.querySelector("#comment");
+
+    if (selectedAnswer != correctAnswer) {
+      secondsLeft - 10;
+      commentEl.append(" Wrong answer");
+
+      // maybe substract any seconds ?
+      // maybe print incorrect in the html element ?
+
+      console.log("incorrect");
+    } else {
+      commentEl.append("Correct answer");
+      // any html element I need to update ?
+      console.log("correct");
+    }
+
+    currentQuestion++;
+    getQuestions.innerHTML = "";
+
+    if (currentQuestion < questionsEl.length) {
+      printQuestion(currentQuestion);
+    } else {
+      endQuiz();
+    }
+  } /*else {
+    endScreen();
+  }*/
+};
+
+function printQuestion(questionIndex) {
+  console.log("print question: " + questionIndex);
+  var questionItem = questionsEl[questionIndex];
+  var questionText = document.createElement("p");
+  questionText.textContent = questionItem.question;
+  questionText.classList.add("p5");
+  getQuestions.appendChild(questionText);
+
+  var answers = questionItem.answers;
+
+  for (const answer in answers) {
+    var answerBtn = document.createElement("button");
+    answerBtn.textContent = answers[answer];
+    answerBtn.addEventListener("click", answerClick);
+    getQuestions.appendChild(answerBtn);
+  }
+}
+
+/*var endScreen = function () {
   startBtn.style.display = "none";
   getQuestions.style.display = "none";
-  endSCreen.style.display = "block";
-};
+  endScreenEl.style.display = "block";
+  clearInterval(timer);
+};*/
+
 function init() {
   startQuiz();
 }
 
 startBtn.addEventListener("click", quizScreen);
-getQuestions.addEventListener("click", endScreen);
+//getQuestions.addEventListener("click", endScreen);
+
+/*var handleSubmit = function (event) {
+  event.preventDefault();
+
+  var storedValue = JSON.parse(localStorage.getItem("highScores")) || [];
+  var updatedScores = storedValue.concat({
+    score: score,
+    initials: initialsInput.value,
+  });
+  localStorage.setItem("highScores", JSON.stringify(updatedScores));
+};*/
+
+var printTime = function () {
+  timerEl.textContent = "Timer: " + secondsLeft;
+};
+
+var startTimer = function () {
+  printTime();
+  timer = setInterval(function () {
+    secondsLeft--;
+    printTime();
+    if (secondsLeft === 0) {
+      clearInterval(timer);
+      timerEl.textContent = "Finitto";
+    }
+  }, 1000);
+};
+
+/*var setTimer = function () {
+  printedSeconds();
+  var countdown = function () {
+    secondsLeft--;
+
+    printedSeconds();
+
+    if (secondsLeft === 0) {
+      clearInterval(countdown);
+      quizResult();
+    }
+  };
+};*/
+
+// var count = localStorage.getItem("count");
+// counter.textContent = count;
+
+// function quizResult() {
+//   console.log("count");
+// }
+
+//endScreen.addEventListener("submit", handleSubmit);
+init();
