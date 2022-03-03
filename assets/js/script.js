@@ -98,7 +98,7 @@ var answerClick = function (event) {
     var commentEl = document.querySelector("#comment");
 
     if (selectedAnswer != correctAnswer) {
-      secondsLeft - 10;
+      secondsLeft = secondsLeft - 10;
       commentEl.append(" Wrong answer");
 
       // maybe substract any seconds ?
