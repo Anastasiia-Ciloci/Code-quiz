@@ -1,3 +1,4 @@
+//question list
 var questionsEl = [
   {
     question: "How old is planet Earth? ",
@@ -13,27 +14,17 @@ var questionsEl = [
     question: "How many continents are there in the world?",
     answers: ["3", "5", "7", "10"],
     correct: 2,
-  } /*,
+  },
   {
     question: "What is the longest river in the world?",
-    answers: {
-      a: "Colorado",
-      b: "Limpopo",
-      c: "Amazon",
-      d: "Nile",
-    },
-    correct: "d",
+    answers: ["Colorado", "Limpopo", "Amazon", "Nile"],
+    correct: 3,
   },
   {
     question: "What is the largest ocean in the world?",
-    answers: {
-      a: "Pacific",
-      b: "Atlantic",
-      c: "Indian",
-      d: "Antarctic",
-    },
-    correct: "a",
-  },*/,
+    answers: ["Pacific", "Atlantic", "Indian", "Antarctic"],
+    correct: 0,
+  },
 ];
 
 // GIVEN I am taking a code quiz
@@ -47,17 +38,18 @@ var questionsEl = [
 // THEN the game is over
 // WHEN the game is over
 // THEN I can save my initials and my score
+
 var startBtn = document.querySelector("#start-btn");
 var getQuestions = document.querySelector("#question-area");
 var endScreenEl = document.querySelector("#endScreen");
 var participantInitials = document.querySelector("#participant");
 var result = [];
 var currentQuestion = 0;
-//Timer
+//Timer variables
 var timerEl = document.querySelector("#timer");
-var secondsLeft = 10;
-var timer;
-// startBtn.style.backgroundColor;
+var secondsLeft = 90;
+var score = 0;
+var scoreArray = [];
 
 //functions for starting game and ending
 var startQuiz = function () {
@@ -82,34 +74,20 @@ var quizScreen = function () {
   startTimer();
 };
 
+//function for starting game
 var answerClick = function (event) {
   if (event.target.matches("button")) {
-    //console.log(event.target);
-    //console.log(event.target.outerText);
     var selectedAnswer = questionsEl[currentQuestion].answers.indexOf(
       event.target.outerText
     );
     var correctAnswer = questionsEl[currentQuestion].correct;
     console.log("selected answer is: " + selectedAnswer);
+
     // grade
     // print correct or not and substract time if incorrect
 
     console.log("correct answer is: " + correctAnswer);
     var commentEl = document.querySelector("#comment");
-
-    if (selectedAnswer != correctAnswer) {
-      secondsLeft = secondsLeft - 10;
-      commentEl.append(" Wrong answer");
-
-      // maybe substract any seconds ?
-      // maybe print incorrect in the html element ?
-
-      console.log("incorrect");
-    } else {
-      commentEl.append("Correct answer");
-      // any html element I need to update ?
-      console.log("correct");
-    }
 
     currentQuestion++;
     getQuestions.innerHTML = "";
@@ -124,6 +102,23 @@ var answerClick = function (event) {
   }*/
 };
 
+var checkAnswer = function () {
+  //deducting time from score if question answered wrongand comments pop up if answer wrong or correct
+  if (selectedAnswer != correctAnswer) {
+    secondsLeft = secondsLeft - 10;
+    commentEl.append(" Wrong answer");
+    console.log("incorrect");
+  } else {
+    commentEl.append("Correct answer");
+    console.log("correct");
+  }
+
+  // answerCommentTimeOut(function () {
+  //   commentEl.style.display = "none";
+  // }, 1000);
+};
+
+//next question
 function printQuestion(questionIndex) {
   console.log("print question: " + questionIndex);
   var questionItem = questionsEl[questionIndex];
@@ -156,7 +151,7 @@ function init() {
 startBtn.addEventListener("click", quizScreen);
 //getQuestions.addEventListener("click", endScreen);
 
-/*var handleSubmit = function (event) {
+var handleSubmit = function (event) {
   event.preventDefault();
 
   var storedValue = JSON.parse(localStorage.getItem("highScores")) || [];
@@ -165,7 +160,7 @@ startBtn.addEventListener("click", quizScreen);
     initials: initialsInput.value,
   });
   localStorage.setItem("highScores", JSON.stringify(updatedScores));
-};*/
+};
 
 var printTime = function () {
   timerEl.textContent = "Timer: " + secondsLeft;
@@ -182,20 +177,6 @@ var startTimer = function () {
     }
   }, 1000);
 };
-
-/*var setTimer = function () {
-  printedSeconds();
-  var countdown = function () {
-    secondsLeft--;
-
-    printedSeconds();
-
-    if (secondsLeft === 0) {
-      clearInterval(countdown);
-      quizResult();
-    }
-  };
-};*/
 
 // var count = localStorage.getItem("count");
 // counter.textContent = count;
