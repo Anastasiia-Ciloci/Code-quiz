@@ -1,5 +1,5 @@
 //question list
-var questionsEl = [
+var questions = [
   {
     question: "How old is planet Earth? ",
     answers: [
@@ -27,105 +27,111 @@ var questionsEl = [
   },
 ];
 
-// GIVEN I am taking a code quiz
-// WHEN I click the start button
-// THEN a timer starts and I am presented with a question
-// WHEN I answer a question
-// THEN I am presented with another question
-// WHEN I answer a question incorrectly
-// THEN time is subtracted from the clock
-// WHEN all questions are answered or the timer reaches 0
-// THEN the game is over
-// WHEN the game is over
-// THEN I can save my initials and my score
-
-var startBtn = document.querySelector("#start-btn");
-var getQuestions = document.querySelector("#question-area");
+var startBtnEl = document.querySelector("#start-btn");
+var getQuestionsEl = document.querySelector("#question-area");
 var endScreenEl = document.querySelector("#endScreen");
-var participantInitials = document.querySelector("#participant");
+var initialsEL = document.querySelector("#initials");
+var highscoresEl = document.querySelector("#highscores");
+var goBackEl = document.querySelector("#goBack");
+var clearScoresEl = document.querySelector("#clearScores");
 var result = [];
 var currentQuestion = 0;
 //Timer variables
 var timerEl = document.querySelector("#timer");
 var secondsLeft = 90;
-var score = 0;
+var clearComment;
 var scoreArray = [];
+var secondsPenalty = 10;
+var resultEl = document.querySelector("#result");
 
 //functions for starting game and ending
 var startQuiz = function () {
-  startBtn.style.display = "block";
-  getQuestions.style.display = "none";
+  startBtnEl.style.display = "block";
+  getQuestionsEl.style.display = "none";
   endScreenEl.style.display = "none";
+  highscoresEl.style.display = "none";
 };
 
 var endQuiz = function () {
-  startBtn.style.display = "none";
-  getQuestions.style.display = "none";
+  startBtnEl.style.display = "none";
+  getQuestionsEl.style.display = "none";
   endScreenEl.style.display = "block";
+  highscoresEl.style.display = "none";
   clearInterval(timer);
   timerEl.innerHTML = "";
+  resultEl.textContent = "Your score is: " + secondsLeft;
 };
 
 var quizScreen = function () {
-  startBtn.style.display = "none";
-  getQuestions.style.display = "block";
+  startBtnEl.style.display = "none";
+  getQuestionsEl.style.display = "block";
   endScreenEl.style.display = "none";
+  endScreenEl.style.display = "none";
+  currentQuestion = 0;
+  secondsLeft = 90;
+  getQuestionsEl.innerHTML = "";
   printQuestion(currentQuestion);
   startTimer();
 };
 
-//function for starting game
+var highscoresScreen = function () {
+  startBtnEl.style.display = "none";
+  getQuestionsEl.style.display = "none";
+  endScreenEl.style.display = "none";
+  highscoresEl.style.display = "block";
+};
+//function for when an answer button is clicked
 var answerClick = function (event) {
   if (event.target.matches("button")) {
-    var selectedAnswer = questionsEl[currentQuestion].answers.indexOf(
+    var selectedAnswer = questions[currentQuestion].answers.indexOf(
       event.target.outerText
     );
-    var correctAnswer = questionsEl[currentQuestion].correct;
-    console.log("selected answer is: " + selectedAnswer);
-
-    // grade
-    // print correct or not and substract time if incorrect
-
-    console.log("correct answer is: " + correctAnswer);
+    var correctAnswer = questions[currentQuestion].correct;
+    //console.log("selected answer is: " + selectedAnswer);
+    //console.log("correct answer is: " + correctAnswer);
+    //comparing wrong with correct
     var commentEl = document.querySelector("#comment");
+    if (selectedAnswer != correctAnswer) {
+      commentEl.textContent = "Wrong answer";
+
+      if (secondsLeft <= secondsPenalty) {
+        commentEl.textContent = "";
+        secondsLeft = 0;
+        endQuiz();
+        return;
+      } else {
+        secondsLeft -= 10;
+      }
+      console.log("incorrect");
+    } else {
+      commentEl.textContent = "Correct answer";
+      console.log("correct");
+    }
+
+    clearTimeout(clearComment);
+
+    clearComment = setTimeout(function () {
+      commentEl.textContent = "";
+    }, 500);
 
     currentQuestion++;
-    getQuestions.innerHTML = "";
-
-    if (currentQuestion < questionsEl.length) {
+    getQuestionsEl.innerHTML = "";
+    if (currentQuestion < questions.length) {
       printQuestion(currentQuestion);
     } else {
       endQuiz();
     }
-  } /*else {
-    endScreen();
-  }*/
-};
-
-var checkAnswer = function () {
-  //deducting time from score if question answered wrongand comments pop up if answer wrong or correct
-  if (selectedAnswer != correctAnswer) {
-    secondsLeft = secondsLeft - 10;
-    commentEl.append(" Wrong answer");
-    console.log("incorrect");
-  } else {
-    commentEl.append("Correct answer");
-    console.log("correct");
   }
-
-  // answerCommentTimeOut(function () {
-  //   commentEl.style.display = "none";
-  // }, 1000);
 };
 
-//next question
+//print question at given index
 function printQuestion(questionIndex) {
-  console.log("print question: " + questionIndex);
-  var questionItem = questionsEl[questionIndex];
+  //console.log("print question: " + questionIndex);
+  var questionItem = questions[questionIndex];
   var questionText = document.createElement("p");
   questionText.textContent = questionItem.question;
   questionText.classList.add("p5");
-  getQuestions.appendChild(questionText);
+  getQuestionsEl.appendChild(questionText);
 
   var answers = questionItem.answers;
 
@@ -133,34 +139,44 @@ function printQuestion(questionIndex) {
     var answerBtn = document.createElement("button");
     answerBtn.textContent = answers[answer];
     answerBtn.addEventListener("click", answerClick);
-    getQuestions.appendChild(answerBtn);
+    getQuestionsEl.appendChild(answerBtn);
   }
 }
-
-/*var endScreen = function () {
-  startBtn.style.display = "none";
-  getQuestions.style.display = "none";
-  endScreenEl.style.display = "block";
-  clearInterval(timer);
-};*/
 
 function init() {
   startQuiz();
 }
 
-startBtn.addEventListener("click", quizScreen);
-//getQuestions.addEventListener("click", endScreen);
+startBtnEl.addEventListener("click", quizScreen);
 
 var handleSubmit = function (event) {
   event.preventDefault();
-
-  var storedValue = JSON.parse(localStorage.getItem("highScores")) || [];
-  var updatedScores = storedValue.concat({
-    score: score,
-    initials: initialsInput.value,
+  var userInitials = initialsEL.value;
+  var storedScores = JSON.parse(localStorage.getItem("highScores")) || [];
+  var updatedScores = storedScores.concat({
+    initials: userInitials,
+    score: secondsLeft,
   });
   localStorage.setItem("highScores", JSON.stringify(updatedScores));
+
+  var scoresRecordEl = document.querySelector("#scoresRecord");
+  var scoresList = document.createElement("ol");
+
+  for (var i = 0; i < updatedScores.length; i++) {
+    var listItem = document.createElement("li");
+    listItem.textContent =
+      updatedScores[i].initials + " - " + updatedScores[i].score;
+    scoresList.appendChild(listItem);
+  }
+  scoresRecordEl.innerHTML = "";
+  scoresRecordEl.appendChild(scoresList);
+
+  //scoresRecordEl.textContent = "Your high score is: " + secondsLeft;
+  highscoresScreen();
 };
+
+var submitBtnEl = document.querySelector("#submit");
+submitBtnEl.addEventListener("click", handleSubmit);
 
 var printTime = function () {
   timerEl.textContent = "Timer: " + secondsLeft;
@@ -173,17 +189,17 @@ var startTimer = function () {
     printTime();
     if (secondsLeft === 0) {
       clearInterval(timer);
-      timerEl.textContent = "Finitto";
+      timerEl.textContent = "All done!";
     }
   }, 1000);
 };
 
-// var count = localStorage.getItem("count");
-// counter.textContent = count;
+goBackEl.addEventListener("click", startQuiz);
+clearScoresEl.addEventListener("click", function () {
+  var emptyArray = [];
+  localStorage.setItem("highScores", JSON.stringify(emptyArray));
+  var scoresRecordEl = document.querySelector("#scoresRecord");
+  scoresRecordEl.textContent = "";
+});
 
-// function quizResult() {
-//   console.log("count");
-// }
-
-//endScreen.addEventListener("submit", handleSubmit);
 init();
