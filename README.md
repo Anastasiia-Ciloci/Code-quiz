@@ -4,7 +4,7 @@
 
 1. [Description](Desription)
 2. [Visuals](Visuals)
-3. A [link](https://https://anastasiia-ciloci.github.io/Code-quiz/) to the website
+3. A [link](https://anastasiia-ciloci.github.io/Code-quiz/) to the website
 
 # Description
 
@@ -29,4 +29,4 @@ After the end of the quiz, a user can save initials and the highest scores. Also
 
 # A link to the website [Geographical quiz](https://anastasiia-ciloci.github.io/Code-quiz/)
 
-Or click [here](https://https://anastasiia-ciloci.github.io/Code-quiz/) to open the website
+Or click [here](https://anastasiia-ciloci.github.io/Code-quiz/) to open the website
